@@ -10,11 +10,11 @@ metadata:
   namespace: fleetman
 spec:
   capacity:
-  storage: 1Gi
+    storage: 1Gi
   accessModes:
-  - ReadWriteOnce
+    - ReadWriteOnce
   hostPath:
-  path: /data/mongo-data
+    path: /data/mongo-data
   storageClassName: standard
 ---
 apiVersion: v1
@@ -24,10 +24,10 @@ metadata:
   namespace: fleetman
 spec:
   accessModes:
-  - ReadWriteOnce
+    - ReadWriteOnce
   resources:
-  requests:
-  storage: 1Gi
+    requests:
+      storage: 1Gi
   storageClassName: standard
 ---
 apiVersion: apps/v1
@@ -38,25 +38,25 @@ metadata:
 spec:
   replicas: 2
   selector:
-  matchLabels:
-  app: fleetman-mongodb
+    matchLabels:
+      app: fleetman-mongodb
   template:
-  metadata:
-  labels:
-  app: fleetman-mongodb
-  spec:
-  containers:
-  - name: fleetman-mongodb
-  image: mongo:3.6.23
-  ports:
-  - containerPort: 27017
-  volumeMounts:
-  - name: mongo-data
-  mountPath: /data/db
-  volumes:
-  - name: mongo-data
-  persistentVolumeClaim:
-  claimName: mongo-pvc
+    metadata:
+      labels:
+        app: fleetman-mongodb
+    spec:
+      containers:
+        - name: fleetman-mongodb
+          image: mongo:3.6.23
+          ports:
+            - containerPort: 27017
+          volumeMounts:
+            - name: mongo-data
+              mountPath: /data/db
+      volumes:
+        - name: mongo-data
+          persistentVolumeClaim:
+            claimName: mongo-pvc
 ---
 apiVersion: v1
 kind: Service
@@ -65,10 +65,10 @@ metadata:
   namespace: fleetman
 spec:
   selector:
-  app: fleetman-mongodb
+    app: fleetman-mongodb
   ports:
-  - port: 27017
-  targetPort: 27017
+    - port: 27017
+      targetPort: 27017
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -78,19 +78,19 @@ metadata:
 spec:
   replicas: 2
   selector:
-  matchLabels:
-  app: fleetman-queue
+    matchLabels:
+      app: fleetman-queue
   template:
-  metadata:
-  labels:
-  app: fleetman-queue
-  spec:
-  containers:
-  - name: fleetman-queue
-  image: supinfo4kube/queue:1.0.1
-  ports:
-  - containerPort: 8161
-  - containerPort: 61616
+    metadata:
+      labels:
+        app: fleetman-queue
+    spec:
+      containers:
+        - name: fleetman-queue
+          image: supinfo4kube/queue:1.1.0
+          ports:
+            - containerPort: 8161
+            - containerPort: 61616
 ---
 apiVersion: v1
 kind: Service
@@ -99,14 +99,14 @@ metadata:
   namespace: fleetman
 spec:
   selector:
-  app: fleetman-queue
+    app: fleetman-queue
   ports:
-  - port: 8161
-  targetPort: 8161
-  name: management
-  - port: 61616
-  targetPort: 61616
-  name: messaging
+    - port: 8161
+      targetPort: 8161
+      name: management
+    - port: 61616
+      targetPort: 61616
+      name: messaging
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -116,19 +116,19 @@ metadata:
 spec:
   replicas: 2
   selector:
-  matchLabels:
-  app: fleetman-position-simulator
+    matchLabels:
+      app: fleetman-position-simulator
   template:
-  metadata:
-  labels:
-  app: fleetman-position-simulator
-  spec:
-  containers:
-  - name: fleetman-position-simulator
-  image: supinfo4kube/position-simulator:1.0.1
-  env:
-  - name: SPRING_PROFILES_ACTIVE
-  value: production-microservice
+    metadata:
+      labels:
+        app: fleetman-position-simulator
+    spec:
+      containers:
+        - name: fleetman-position-simulator
+          image: supinfo4kube/position-simulator:1.1.0
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: production-microservice
 ---
 apiVersion: v1
 kind: Service
@@ -137,10 +137,10 @@ metadata:
   namespace: fleetman
 spec:
   selector:
-  app: fleetman-position-simulator
+    app: fleetman-position-simulator
   ports:
-  - port: 8080
-  targetPort: 8080
+    - port: 8080
+      targetPort: 8080
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -150,21 +150,21 @@ metadata:
 spec:
   replicas: 2
   selector:
-  matchLabels:
-  app: fleetman-position-tracker
+    matchLabels:
+      app: fleetman-position-tracker
   template:
-  metadata:
-  labels:
-  app: fleetman-position-tracker
-  spec:
-  containers:
-  - name: fleetman-position-tracker
-  image: supinfo4kube/position-tracker:1.0.1
-  ports:
-  - containerPort: 8080
-  env:
-  - name: SPRING_PROFILES_ACTIVE
-  value: production-microservice
+    metadata:
+      labels:
+        app: fleetman-position-tracker
+    spec:
+      containers:
+        - name: fleetman-position-tracker
+          image: supinfo4kube/position-tracker:1.1.0
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: production-microservice
 ---
 apiVersion: v1
 kind: Service
@@ -173,10 +173,10 @@ metadata:
   namespace: fleetman
 spec:
   selector:
-  app: fleetman-position-tracker
+    app: fleetman-position-tracker
   ports:
-  - port: 8080
-  targetPort: 8080
+    - port: 8080
+      targetPort: 8080
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -186,21 +186,21 @@ metadata:
 spec:
   replicas: 2
   selector:
-  matchLabels:
-  app: fleetman-api-gateway
+    matchLabels:
+      app: fleetman-api-gateway
   template:
-  metadata:
-  labels:
-  app: fleetman-api-gateway
-  spec:
-  containers:
-  - name: fleetman-api-gateway
-  image: supinfo4kube/api-gateway:1.0.1
-  ports:
-  - containerPort: 8080
-  env:
-  - name: SPRING_PROFILES_ACTIVE
-  value: production-microservice
+    metadata:
+      labels:
+        app: fleetman-api-gateway
+    spec:
+      containers:
+        - name: fleetman-api-gateway
+          image: supinfo4kube/api-gateway:1.1.0
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: production-microservice
 ---
 apiVersion: v1
 kind: Service
@@ -209,10 +209,10 @@ metadata:
   namespace: fleetman
 spec:
   selector:
-  app: fleetman-api-gateway
+    app: fleetman-api-gateway
   ports:
-  - port: 8080
-  targetPort: 8080
+    - port: 8080
+      targetPort: 8080
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -222,18 +222,18 @@ metadata:
 spec:
   replicas: 2
   selector:
-  matchLabels:
-  app: fleetman-webapp
+    matchLabels:
+      app: fleetman-webapp
   template:
-  metadata:
-  labels:
-  app: fleetman-webapp
-  spec:
-  containers:
-  - name: fleetman-webapp
-  image: supinfo4kube/web-app:1.0.0
-  ports:
-  - containerPort: 80
+    metadata:
+      labels:
+        app: fleetman-webapp
+    spec:
+      containers:
+        - name: fleetman-webapp
+          image: supinfo4kube/web-app:1.1.0
+          ports:
+            - containerPort: 80
 ---
 apiVersion: v1
 kind: Service
@@ -242,9 +242,9 @@ metadata:
   namespace: fleetman
 spec:
   selector:
-  app: fleetman-webapp
+    app: fleetman-webapp
   ports:
-  - port: 80
-  targetPort: 80
-  nodePort: 30080
+    - port: 80
+      targetPort: 80
+      nodePort: 30080
   type: NodePort
